@@ -8,7 +8,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: visitor-spring-boot
+  IMAGE_NAME: bestrand/visitors
 
 jobs:
   build:
@@ -24,7 +24,7 @@ jobs:
           distribution: 'liberica'
           java-version: 17
 
-      - run: echo "IMAGE_TAG=${GITHUB_SHA::7}" >> "$GITHUB_ENV"
+      - run: echo "IMAGE_TAG=spring-boot-${GITHUB_SHA::7}" >> "$GITHUB_ENV"
 
       - name: Build image
         run: cd spring-boot && mvn spring-boot:build-image -Dspring-boot.build-image.imageName=${{ env.REGISTRY }}/${{env.IMAGE_NAME}}:${{env.IMAGE_TAG}}
