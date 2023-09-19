@@ -24,12 +24,10 @@ jobs:
           distribution: 'liberica'
           java-version: 17
 
+      - run: echo "IMAGETAG=${GITHUB_SHA::7}" >> "$GITHUB_ENV"
+
       - name: Build image
-        run: |
-          echo "IMAGETAG=${GITHUB_SHA::7}" >> "$GITHUB_ENV"
-          cd spring-boot
-          mvn spring-boot:build-image -Dspring-boot.build-image.imageName=${{ env.REGISTRY }}/${{env.IMAGE-NAME}}:${{env.IMAGETAG}}
-          echo "IMAGE_DIGEST=$(docker inspect --format='{{.RepoDigests}}' ${{ env.REGISTRY }}/${{env.IMAGE-NAME}}:${{env.IMAGETAG}}|cut -d '@' -f 2|cut -d ']' -f 1)" >> "$GITHUB_ENV"
+        run: cd spring-boot && mvn spring-boot:build-image -Dspring-boot.build-image.imageName=${{ env.REGISTRY }}/${{env.IMAGE_NAME}}:${{env.IMAGETAG}}
      
       - name: Log into registry ${{ env.REGISTRY }}
         uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
