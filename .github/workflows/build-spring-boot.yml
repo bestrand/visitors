@@ -1,0 +1,37 @@
+name: Build Spring Boot
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - spring-boot/**
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: visitor-spring-boot
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Build image
+        run: | 
+          echo "IMAGETAG=${GITHUB_SHA::7}" >> "$GITHUB_ENV"
+          cd spring-boot
+          mvn spring-boot:build-image -Dspring-boot.build-image.imageName=${{ env.REGISTRY }}/${{env.IMAGE-NAME}}:${{env.IMAGETAG}}
+          echo "IMAGE_DIGEST=$(docker inspect --format='{{.RepoDigests}}' ${{ env.REGISTRY }}/${{env.IMAGE-NAME}}:${{env.IMAGETAG}}|cut -d '@' -f 2|cut -d ']' -f 1)" >> "$GITHUB_ENV"
+     
+      - name: Log into registry ${{ env.REGISTRY }}
+        uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 'Push image'
+        run:
+          docker push ${{ env.REGISTRY }}/${{env.IMAGE-NAME}}:${{env.IMAGETAG}}
