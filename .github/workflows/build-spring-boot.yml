@@ -19,7 +19,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Build image
-        run: | 
+        run: |
           echo "IMAGETAG=${GITHUB_SHA::7}" >> "$GITHUB_ENV"
           cd spring-boot
           mvn spring-boot:build-image -Dspring-boot.build-image.imageName=${{ env.REGISTRY }}/${{env.IMAGE-NAME}}:${{env.IMAGETAG}}
